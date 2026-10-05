@@ -16,3 +16,9 @@ This is a local laptop proof. It does not call a hosted model and it does not ap
 ## Ops plane
 
 Workspaces, tenant isolation, job approval, and audit live under `/v1`. Production apply is refused. See `docs/ARCHITECTURE.md`.
+
+## Project documentation
+
+- [Project architecture and component diagram](PROJECT_ARCHITECTURE.md)
+- [Domain request and job approval flows](docs/PROCESS_FLOW.md)
+- [Project-specific interview questions and answers](INTERVIEW_QA.md)
