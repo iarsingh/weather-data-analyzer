@@ -10,7 +10,7 @@ Source: [src/weather/analyze.py](src/weather/analyze.py).
 
 ## 2. How are invalid temperatures handled?
 
-Each `temp_c` value is converted with `float`. Conversion failures are skipped and counted. If every row is skipped, the function raises `InputError` instead of returning empty statistics.
+Each `temp_c` value is converted with `float`. Conversion failures, booleans, non-finite values, and temperatures outside [-100, 100] are skipped and counted. If every row is skipped, the function raises `InputError` instead of returning empty statistics.
 
 Source: [src/weather/analyze.py](src/weather/analyze.py).
 
@@ -28,7 +28,7 @@ Source: [src/weather/analyze.py](src/weather/analyze.py).
 
 ## 5. How are missing city names grouped?
 
-A missing city defaults to `unknown`; the grouping key is converted to a string. Explicit null becomes the string `None`, which differs from the missing-field default.
+Missing, null, and blank city values are normalized to `unknown`; other city strings are trimmed. The result includes city sample counts as well as means.
 
 Source: [src/weather/analyze.py](src/weather/analyze.py).
 
@@ -40,7 +40,7 @@ Source: [src/weather/analyze.py](src/weather/analyze.py).
 
 ## 7. Does numeric conversion reject non-finite values?
 
-No explicit finiteness check exists. Strings representing NaN or infinity can pass `float`; production validation should reject non-finite numbers and enforce realistic temperature ranges.
+The function explicitly rejects non-finite values, booleans, and values outside its supported [-100, 100] Celsius range. Such rows increase `skipped`; a request with no valid values returns HTTP 422. Input is limited to 10,000 rows.
 
 Source: [src/weather/analyze.py](src/weather/analyze.py).
 
@@ -70,7 +70,7 @@ Source: [src/weather/ops.py](src/weather/ops.py).
 
 ## 12. What happens when a production job is approved?
 
-Targets exactly equal to `prod` or `production` create a `pending_approval` job and approval returns HTTP 403. Other target strings are queued. Approval of a lab job changes its status only; it does not execute a workload.
+Targets are trimmed and normalized to lowercase before policy checks. `prod` and `production`, including case/padding variants, create a `pending_approval` job and approval returns HTTP 403. Repeated lab approval is idempotent; approval changes a record only, without executing a workload.
 
 Source: [src/weather/ops.py](src/weather/ops.py).
 
